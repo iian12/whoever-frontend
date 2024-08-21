@@ -1,0 +1,46 @@
+/* 메인 페이지 컨테이너 스타일 */
+.main-page-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+/* 제목 스타일 */
+.main-page-container h1 {
+    text-align: center;
+    color: #333;
+}
+
+/* 에러 메시지 스타일 */
+.error-message {
+    color: red;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* 포스트 목록 스타일 */
+.posts-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.posts-list li {
+    background-color: #f4f4f4;
+    margin: 10px 0;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+}
+
+.posts-list li:hover {
+    background-color: #e9e9e9;
+}
+
+/* 빈 게시물 메시지 스타일 */
+.no-posts-message {
+    text-align: center;
+    font-style: italic;
+    color: #666;
+}
