@@ -29,7 +29,7 @@ const SignUp = () => {
         e.preventDefault();
 
         apiClient
-            .post('/auth/signup', formData)
+            .post('/member/register', formData)
             .then(() => {
                 setSuccessMessage('Registration successful! You can now log in.');
                 setFormData({

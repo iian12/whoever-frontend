@@ -1,9 +1,8 @@
 // src/Login.js
 import React, { useState } from 'react';
 import axios from 'axios';
-import './LoginPage.css'; // 스타일을 위한 CSS 파일
-
-const API_BASE_URL = 'YOUR_API_BASE_URL'; // API_BASE_URL을 실제 URL로 대체하세요.
+import './LoginPage.css';
+import { API_BASE_URL } from './apiConfig';// 스타일을 위한 CSS 파일
 
 const apiClient = axios.create({
     baseURL: API_BASE_URL,
