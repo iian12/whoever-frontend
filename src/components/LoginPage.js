@@ -1,8 +1,8 @@
-// src/Login.js
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 import './LoginPage.css';
-import { API_BASE_URL } from './apiConfig';// 스타일을 위한 CSS 파일
+import { API_BASE_URL } from './apiConfig';
 
 const apiClient = axios.create({
     baseURL: API_BASE_URL,
@@ -57,8 +57,8 @@ const Login = ({ onLogin }) => {
                 </label>
                 <button type="submit">Sign In</button>
                 <div className="login-links">
-                    <a href="#">Forgot your password?</a>
-                    <a href="#">Register</a>
+                    <Link to="/reset-password">Forgot your password?</Link>
+                    <Link to="/signup">Register</Link>
                 </div>
             </form>
         </div>

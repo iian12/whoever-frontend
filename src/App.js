@@ -5,7 +5,8 @@ import MainPage from './components/MainPage';
 import LoginPage from './components/LoginPage';
 import ProfilePage from './components/ProfilePage';
 import CreatePostPage from './components/CreatePostPage';
-import SignUpPage from './components/SignUpPage'; // SignupPage 임포트
+import SignUpPage from './components/SignUpPage';
+import PasswordResetPage from './components/PasswordResetPage';
 import { getToken } from './utils/auth';
 
 const App = () => {
@@ -38,8 +39,12 @@ const App = () => {
                 />
                 <Route
                     path="/signup"
-                    element={isLoggedIn ? <Navigate to="/" /> : <SignUpPage />} // SignupPage 경로 추가
+                    element={isLoggedIn ? <Navigate to="/" /> : <SignUpPage />}
                 />
+                <Route
+                    path="/reset-password"
+                    element={isLoggedIn ? <Navigate to="/" /> : <PasswordResetPage />}
+                    />
                 <Route
                     path="/profile"
                     element={isLoggedIn ? <ProfilePage /> : <Navigate to="/login" />}
