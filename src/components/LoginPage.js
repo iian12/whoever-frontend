@@ -6,6 +6,7 @@ import { API_BASE_URL } from './apiConfig';
 
 const apiClient = axios.create({
     baseURL: API_BASE_URL,
+    withCredentials: true, // 쿠키를 받기 위해 설정
 });
 
 const Login = ({ onLogin }) => {
@@ -19,8 +20,6 @@ const Login = ({ onLogin }) => {
         apiClient
             .post('/auth/login', { username, password })
             .then((response) => {
-                const { accessToken } = response.data;
-                localStorage.setItem('accessToken', accessToken);
                 onLogin(); // 로그인 성공 시 호출
             })
             .catch((error) => {
