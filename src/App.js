@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import React, {useEffect, useState} from "react";
+import {BrowserRouter as Router, Navigate, Route, Routes} from "react-router-dom";
 import NavBar from './components/NavBar';
 import MainPage from './components/MainPage';
 import LoginPage from './components/LoginPage';
@@ -7,7 +7,6 @@ import ProfilePage from './components/ProfilePage';
 import CreatePostPage from './components/CreatePostPage';
 import SignUpPage from './components/SignUpPage';
 import PasswordResetPage from './components/PasswordResetPage';
-import { getToken } from './utils/auth';
 import Cookies from 'js-cookie';
 import PostDetailPage from "./components/PostDetailPage"; // 쿠키에서 토큰을 가져오기 위한 라이브러리
 
@@ -55,7 +54,7 @@ const App = () => {
                 />
                 <Route
                     path="/posts/:postId"
-                    element={<PostDetailPage />} // 게시글 상세 페이지
+                    element={<PostDetailPage />}
                 />
             </Routes>
         </Router>

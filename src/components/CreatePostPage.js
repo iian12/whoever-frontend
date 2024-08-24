@@ -1,19 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import axios from 'axios';
-import MarkdownIt from 'markdown-it';
-import MdEditor from 'react-markdown-editor-lite';
-import 'react-markdown-editor-lite/lib/index.css';
+import MDEditor from '@uiw/react-md-editor';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
-import { API_BASE_URL } from './apiConfig';
+import { API_BASE_URL, API_BASE_IMAGE_URL } from './apiConfig';
 import './CreatePostPage.css';
-
-const mdParser = new MarkdownIt();
 
 const apiClient = axios.create({
     baseURL: API_BASE_URL,
-    withCredentials: true, // 쿠키를 포함하도록 설정
+    withCredentials: true, // Include cookies in requests
 });
+
+const imageClient = axios.create({
+    baseURL: API_BASE_IMAGE_URL,
+    withCredentials: true,
+})
 
 const CreatePostPage = () => {
     const [title, setTitle] = useState('');
@@ -21,12 +22,12 @@ const CreatePostPage = () => {
     const [tags, setTags] = useState([]);
     const [suggestedTags, setSuggestedTags] = useState([]);
     const [error, setError] = useState(null);
-    const [image, setImage] = useState(null);
 
     const navigate = useNavigate();
+    const fileInputRef = useRef(null);
 
-    const handleEditorChange = ({ text }) => {
-        setContent(text);
+    const handleEditorChange = (value) => {
+        setContent(value || '');
     };
 
     const handleAddTag = (tag) => {
@@ -40,10 +41,10 @@ const CreatePostPage = () => {
     };
 
     const handleGetSuggestedTags = async () => {
-        const token = getAccessToken(); // 쿠키에서 토큰을 가져옴
+        const token = getAccessToken(); // Retrieve token from cookies
         try {
             const response = await apiClient.post('/tags/suggest', { content }, {
-                headers: { Authorization: `Bearer ${token}` }, // 헤더에 토큰 포함
+                headers: { Authorization: `Bearer ${token}` },
             });
 
             setSuggestedTags(response.data.suggestedTags);
@@ -53,10 +54,10 @@ const CreatePostPage = () => {
     };
 
     const handleGetDraft = async () => {
-        const token = getAccessToken(); // 쿠키에서 토큰을 가져옴
+        const token = getAccessToken(); // Retrieve token from cookies
         try {
             const response = await apiClient.post('/drafts/generate', { title, tags }, {
-                headers: { Authorization: `Bearer ${token}` }, // 헤더에 토큰 포함
+                headers: { Authorization: `Bearer ${token}` },
             });
             setContent(response.data.draft);
         } catch (err) {
@@ -64,31 +65,51 @@ const CreatePostPage = () => {
         }
     };
 
-    const handleImageUpload = async (event) => {
-        const token = getAccessToken(); // 쿠키에서 토큰을 가져옴
-        const file = event.target.files[0];
-        if (!file) return;
-
+    const handleImageUpload = async (file) => {
+        const token = getAccessToken(); // Retrieve token from cookies
         const formData = new FormData();
         formData.append('file', file);
 
         try {
-            const response = await apiClient.post('/images/upload', formData, {
+            const response = await imageClient.post('/images/upload', formData, {
                 headers: {
-                    Authorization: `Bearer ${token}`, // 헤더에 토큰 포함
+                    Authorization: `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data'
                 },
             });
-            const imageUrl = response.data.url;
-            setContent(content + `\n![image](${imageUrl})\n`);
+
+            if (response.status === 200 && response.data.url) {
+                return response.data.url; // 서버로부터 받은 이미지 URL을 반환
+            } else {
+                throw new Error('Invalid response from server');
+            }
         } catch (err) {
             setError('Failed to upload image');
+            return null;
+        }
+    };
+
+    // 에디터의 이미지 업로드 버튼 클릭 시 호출될 함수
+    const handleImageButtonClick = () => {
+        fileInputRef.current.click(); // 숨겨진 파일 입력 요소를 클릭
+    };
+
+    // 파일이 선택되었을 때 호출될 함수
+    const handleImageUploadChange = async (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const imageUrl = await handleImageUpload(file);
+            if (imageUrl) {
+                // 서버에서 받은 이미지 URL을 콘텐츠에 추가
+                setContent((prevContent) => {
+                    return prevContent + `\n![image](${imageUrl})\n`;
+                });
+            }
         }
     };
 
     const handleSubmit = async () => {
         const token = getAccessToken();
-        console.log(token); // 쿠키에서 토큰을 가져옴
         if (!title.trim() || !content.trim()) {
             setError('Title and content cannot be empty.');
             return;
@@ -96,15 +117,15 @@ const CreatePostPage = () => {
 
         try {
             const response = await apiClient.post('/posts', { title, content, hashtagNames: tags }, {
-                headers: { Authorization: `Bearer ${token}` }, // 헤더에 토큰 포함
+                headers: { Authorization: `Bearer ${token}` },
             });
 
-            const postId = response.data; // 서버로부터 받은 게시글 ID
+            const postId = response.data; // 서버 응답으로부터 포스트 ID를 가져옴
 
             if (postId) {
                 const isConfirmed = window.confirm('Post created successfully. Do you want to view the post?');
                 if (isConfirmed) {
-                    navigate(`/posts/${postId}`); // 해당 게시글 페이지로 리다이렉트
+                    navigate(`/posts/${postId}`); // 새로 생성된 포스트 페이지로 리디렉션
                 }
             } else {
                 alert('Post created successfully, but no post ID returned.');
@@ -115,7 +136,7 @@ const CreatePostPage = () => {
     };
 
     const getAccessToken = () => {
-        return Cookies.get('accessToken'); // 쿠키에서 accessToken 가져오기
+        return Cookies.get('accessToken'); // 쿠키에서 accessToken을 가져옴
     };
 
     return (
@@ -133,13 +154,21 @@ const CreatePostPage = () => {
             </div>
             <div className="form-group">
                 <label htmlFor="content">Content</label>
-                <MdEditor
+                <MDEditor
                     id="content"
                     value={content}
-                    style={{ height: '500px' }}
-                    renderHTML={(text) => mdParser.render(text)}
                     onChange={handleEditorChange}
                 />
+                {/* 숨겨진 파일 입력 요소 */}
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    style={{ display: 'none' }}
+                    onChange={handleImageUploadChange}
+                />
+                <button type="button" onClick={handleImageButtonClick}>
+                    Upload Image
+                </button>
             </div>
             <div className="form-group">
                 <label htmlFor="tags">Tags</label>
@@ -177,14 +206,6 @@ const CreatePostPage = () => {
                         ))}
                     </div>
                 )}
-            </div>
-            <div className="form-group">
-                <label htmlFor="imageUpload">Upload Image</label>
-                <input
-                    type="file"
-                    id="imageUpload"
-                    onChange={handleImageUpload}
-                />
             </div>
             <div className="form-group">
                 <button onClick={handleGetDraft}>Get AI Draft</button>

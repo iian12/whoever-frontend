@@ -3,11 +3,12 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { API_BASE_URL } from './apiConfig';
 import Cookies from 'js-cookie';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import './PostDetailPage.css';
 
 const apiClient = axios.create({
-    baseURL: API_BASE_URL,
-    withCredentials: true, // 쿠키를 포함하도록 설정
+    baseURL: API_BASE_URL
 });
 
 const PostDetailPage = () => {
@@ -53,14 +54,9 @@ const PostDetailPage = () => {
     };
 
     const handleCommentSubmit = async () => {
-        if (!isAuthenticated) {
-            setError('You must be logged in to comment.');
-            return;
-        }
-
         try {
             const token = Cookies.get('accessToken');
-            const headers = { Authorization: `Bearer ${token}` };
+            const headers = token ? { Authorization: `Bearer ${token}` } : {};
             const response = await apiClient.post(`/posts/${postId}/comments`, { content: newComment }, { headers });
 
             setPost(prevPost => ({
@@ -75,14 +71,9 @@ const PostDetailPage = () => {
     };
 
     const handleLike = async () => {
-        if (!isAuthenticated) {
-            setError('You must be logged in to like this post.');
-            return;
-        }
-
         try {
             const token = Cookies.get('accessToken');
-            const headers = { Authorization: `Bearer ${token}` };
+            const headers = token ? { Authorization: `Bearer ${token}` } : {};
             await apiClient.post(`/posts/${postId}/like`, {}, { headers });
 
             setPost(prevPost => ({
@@ -109,7 +100,12 @@ const PostDetailPage = () => {
                 <span className="view-count">Views: {post.viewCount}</span> |
                 <span className="comment-count">Comments: {post.commentCount}</span>
             </p>
-            <div className="post-content" dangerouslySetInnerHTML={{ __html: post.content }} />
+
+            <div className="post-content">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {post.content}
+                </ReactMarkdown>
+            </div>
 
             <div className="hashtags-section">
                 <h2>Hashtags</h2>
