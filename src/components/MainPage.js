@@ -36,7 +36,7 @@ const MainPage = ({handleLogout}) => {
                 const currentTime = Date.now() / 1000; // 현재 시간 (초 단위)
                 const tokenExpTime = decodedToken.exp; // 만료 시간 (초 단위)
 
-                // 만료 시간이 5분 이하 남았으면
+                // 만료 시간이 15분 이하 남았으면
                 if (tokenExpTime - currentTime < 15 * 60) {
                     handleLogout(); // 로그아웃 상태로 변경
                 }
@@ -55,9 +55,21 @@ const MainPage = ({handleLogout}) => {
                     posts.map((post) => (
                         <li key={post.id} className="post-item">
                             <Link to={`/posts/${post.id}`} className="post-link">
-                                <h2>{post.title}</h2>
-                                <p className="author">By {post.authorNickname}</p>
-                                <p className="date">{new Date(post.createdAt).toLocaleString()}</p>
+                                {/* 썸네일 이미지 추가 */}
+                                {post.thumbnailUrl && (
+                                    <div className="thumbnail-container">
+                                        <img
+                                            src={post.thumbnailUrl}
+                                            alt={post.title}
+                                            className="thumbnail-image"
+                                        />
+                                    </div>
+                                )}
+                                <div className="post-info">
+                                    <h2>{post.title}</h2>
+                                    <p className="author">By {post.authorNickname}</p>
+                                    <p className="date">{new Date(post.createdAt).toLocaleString()}</p>
+                                </div>
                             </Link>
                         </li>
                     ))
