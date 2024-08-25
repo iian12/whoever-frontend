@@ -16,6 +16,7 @@ const NavBar = ({ isLoggedIn, onLogout }) => {
                     </>
                 ) : (
                     <>
+                        <Link to="/new-post">새 글 작성</Link>
                         <Link to="/profile">Profile</Link>
                         <button onClick={onLogout}>Logout</button>
                     </>

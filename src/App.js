@@ -1,21 +1,21 @@
-import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import React, {useEffect, useState} from "react";
+import {BrowserRouter as Router, Navigate, Route, Routes} from "react-router-dom";
 import NavBar from './components/NavBar';
 import MainPage from './components/MainPage';
 import LoginPage from './components/LoginPage';
 import ProfilePage from './components/ProfilePage';
 import CreatePostPage from './components/CreatePostPage';
-import SignUpPage from './components/SignUpPage'; // SignupPage 임포트
-import { getToken } from './utils/auth';
+import SignUpPage from './components/SignUpPage';
+import PasswordResetPage from './components/PasswordResetPage';
+import Cookies from 'js-cookie';
+import PostDetailPage from "./components/PostDetailPage"; // 쿠키에서 토큰을 가져오기 위한 라이브러리
 
 const App = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     useEffect(() => {
-        const token = getToken();
-        if (token) {
-            setIsLoggedIn(true);
-        }
+        const token = Cookies.get('accessToken'); // 쿠키에서 토큰을 가져옴
+        setIsLoggedIn(!!token); // 토큰이 있으면 로그인 상태로 설정
     }, []);
 
     const handleLogin = () => {
@@ -23,8 +23,10 @@ const App = () => {
     };
 
     const handleLogout = () => {
-        localStorage.removeItem('accessToken');
+        Cookies.remove('accessToken');
+        Cookies.remove('refreshToken');// 쿠키에서 토큰을 제거
         setIsLoggedIn(false);
+        window.location.href = '/';
     };
 
     return (
@@ -38,15 +40,23 @@ const App = () => {
                 />
                 <Route
                     path="/signup"
-                    element={isLoggedIn ? <Navigate to="/" /> : <SignUpPage />} // SignupPage 경로 추가
+                    element={isLoggedIn ? <Navigate to="/" /> : <SignUpPage />}
+                />
+                <Route
+                    path="/reset-password"
+                    element={isLoggedIn ? <Navigate to="/" /> : <PasswordResetPage />}
                 />
                 <Route
                     path="/profile"
                     element={isLoggedIn ? <ProfilePage /> : <Navigate to="/login" />}
                 />
                 <Route
-                    path="/create-post"
+                    path="/new-post"
                     element={isLoggedIn ? <CreatePostPage /> : <Navigate to="/login" />}
+                />
+                <Route
+                    path="/posts/:postId"
+                    element={<PostDetailPage />}
                 />
             </Routes>
         </Router>

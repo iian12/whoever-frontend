@@ -23,6 +23,7 @@
 .posts-list {
     list-style-type: none;
     padding: 0;
+    color: #000000;
 }
 
 .posts-list li {
