@@ -23,8 +23,10 @@ const App = () => {
     };
 
     const handleLogout = () => {
-        Cookies.remove('accessToken'); // 쿠키에서 토큰을 제거
+        Cookies.remove('accessToken');
+        Cookies.remove('refreshToken');// 쿠키에서 토큰을 제거
         setIsLoggedIn(false);
+        window.location.href = '/';
     };
 
     return (

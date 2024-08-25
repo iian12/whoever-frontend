@@ -1,131 +1,115 @@
-import React, { useState, useRef } from 'react';
-import axios from 'axios';
-import MDEditor from '@uiw/react-md-editor';
+import React, { useState, useRef, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { materialLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import Cookies from 'js-cookie';
 import { API_BASE_URL, API_BASE_IMAGE_URL } from './apiConfig';
 import './CreatePostPage.css';
 
-const apiClient = axios.create({
-    baseURL: API_BASE_URL,
-    withCredentials: true, // Include cookies in requests
-});
-
-const imageClient = axios.create({
-    baseURL: API_BASE_IMAGE_URL,
-    withCredentials: true,
-})
-
 const CreatePostPage = () => {
     const [title, setTitle] = useState('');
-    const [content, setContent] = useState('');
+    const [markdown, setMarkdown] = useState('');
     const [tags, setTags] = useState([]);
-    const [suggestedTags, setSuggestedTags] = useState([]);
+    const fileInputRef = useRef(null);
     const [error, setError] = useState(null);
+    const [isPreviewReady, setIsPreviewReady] = useState(false);
+
+    const insertText = (text) => {
+        const textarea = document.querySelector('.markdown-editor');
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const before = markdown.substring(0, start);
+        const after = markdown.substring(end, markdown.length);
+        setMarkdown(`${before}${text}${after}`);
+    };
 
     const navigate = useNavigate();
-    const fileInputRef = useRef(null);
 
-    const handleEditorChange = (value) => {
-        setContent(value || '');
+    useEffect(() => {
+        setIsPreviewReady(true);
+    }, [markdown]);
+
+    const handleBold = () => {
+        insertText('**텍스트**');
     };
 
-    const handleAddTag = (tag) => {
-        if (!tags.includes(tag)) {
-            setTags([...tags, tag]);
-        }
+    const handleItalic = () => {
+        insertText('*텍스트*');
     };
 
-    const handleRemoveTag = (tag) => {
-        setTags(tags.filter(t => t !== tag));
+    const handleStrikethrough = () => {
+        insertText('~~텍스트~~');
     };
 
-    const handleGetSuggestedTags = async () => {
-        const token = getAccessToken(); // Retrieve token from cookies
-        try {
-            const response = await apiClient.post('/tags/suggest', { content }, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-
-            setSuggestedTags(response.data.suggestedTags);
-        } catch (err) {
-            setError('Failed to get suggested tags');
-        }
+    const handleLink = () => {
+        insertText('[링크 텍스트](https://example.com)');
     };
 
-    const handleGetDraft = async () => {
-        const token = getAccessToken(); // Retrieve token from cookies
-        try {
-            const response = await apiClient.post('/drafts/generate', { title, tags }, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            setContent(response.data.draft);
-        } catch (err) {
-            setError('Failed to generate draft');
-        }
+    const handleBlockquote = () => {
+        insertText('> 인용문\n');
     };
 
-    const handleImageUpload = async (file) => {
-        const token = getAccessToken(); // Retrieve token from cookies
-        const formData = new FormData();
-        formData.append('file', file);
-
-        try {
-            const response = await imageClient.post('/images/upload', formData, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'multipart/form-data'
-                },
-            });
-
-            if (response.status === 200 && response.data.url) {
-                return response.data.url; // 서버로부터 받은 이미지 URL을 반환
-            } else {
-                throw new Error('Invalid response from server');
-            }
-        } catch (err) {
-            setError('Failed to upload image');
-            return null;
-        }
+    const handleHeading = (level) => {
+        insertText(`${'#'.repeat(level)} 제목\n`);
     };
 
-    // 에디터의 이미지 업로드 버튼 클릭 시 호출될 함수
-    const handleImageButtonClick = () => {
-        fileInputRef.current.click(); // 숨겨진 파일 입력 요소를 클릭
+    const handleCode = () => {
+        insertText('```\n코드블록\n```');
     };
 
-    // 파일이 선택되었을 때 호출될 함수
-    const handleImageUploadChange = async (event) => {
-        const file = event.target.files[0];
+    const handleImageUpload = () => {
+        fileInputRef.current.click();
+    };
+
+    const handleFileChange = async (e) => {
+        const file = e.target.files[0];
         if (file) {
-            const imageUrl = await handleImageUpload(file);
-            if (imageUrl) {
-                // 서버에서 받은 이미지 URL을 콘텐츠에 추가
-                setContent((prevContent) => {
-                    return prevContent + `\n![image](${imageUrl})\n`;
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await axios.post(`${API_BASE_IMAGE_URL}/images/upload`, formData, {
+                    headers: {
+                        Authorization: `Bearer ${Cookies.get('accessToken')}`,
+                        'Content-Type': 'multipart/form-data'
+                    },
                 });
+                if (response.status === 200 && response.data.url) {
+                    insertText(`![이미지 설명](${response.data.url})`);
+                } else {
+                    throw new Error('Invalid response from server');
+                }
+            } catch (err) {
+                setError('Failed to upload image');
             }
         }
     };
 
     const handleSubmit = async () => {
-        const token = getAccessToken();
-        if (!title.trim() || !content.trim()) {
+        const token = Cookies.get('accessToken');
+        if (!title.trim() || !markdown.trim()) {
             setError('Title and content cannot be empty.');
             return;
         }
 
         try {
-            const response = await apiClient.post('/posts', { title, content, hashtagNames: tags }, {
+            const response = await axios.post(`${API_BASE_URL}/posts`, {
+                title,
+                content: markdown,
+                hashtagNames: tags
+            }, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
-            const postId = response.data; // 서버 응답으로부터 포스트 ID를 가져옴
-
+            const postId = response.data;
             if (postId) {
                 const isConfirmed = window.confirm('Post created successfully. Do you want to view the post?');
                 if (isConfirmed) {
-                    navigate(`/posts/${postId}`); // 새로 생성된 포스트 페이지로 리디렉션
+                    navigate(`/posts/${postId}`);
                 }
             } else {
                 alert('Post created successfully, but no post ID returned.');
@@ -135,84 +119,112 @@ const CreatePostPage = () => {
         }
     };
 
-    const getAccessToken = () => {
-        return Cookies.get('accessToken'); // 쿠키에서 accessToken을 가져옴
+    const handleAddTag = (tag) => {
+        if (tag && !tags.includes(tag)) {
+            setTags([...tags, tag]);
+        }
+    };
+
+    const handleRemoveTag = (tag) => {
+        setTags(tags.filter(t => t !== tag));
     };
 
     return (
-        <div className="create-post-container">
-            <h1>Create a New Post</h1>
-            {error && <p className="error-message">{error}</p>}
-            <div className="form-group">
-                <label htmlFor="title">Title</label>
-                <input
-                    id="title"
-                    type="text"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                />
-            </div>
-            <div className="form-group">
-                <label htmlFor="content">Content</label>
-                <MDEditor
-                    id="content"
-                    value={content}
-                    onChange={handleEditorChange}
-                />
-                {/* 숨겨진 파일 입력 요소 */}
-                <input
-                    type="file"
-                    ref={fileInputRef}
-                    style={{ display: 'none' }}
-                    onChange={handleImageUploadChange}
-                />
-                <button type="button" onClick={handleImageButtonClick}>
-                    Upload Image
-                </button>
-            </div>
-            <div className="form-group">
-                <label htmlFor="tags">Tags</label>
-                <div className="tags-input">
-                    {tags.map(tag => (
-                        <span key={tag} className="tag">
-                            {tag}
-                            <button onClick={() => handleRemoveTag(tag)}>x</button>
-                        </span>
-                    ))}
+        <div className="create-post-page">
+            <div className="editor-section">
+                <div className="editor-header">
+                    <h1>제목을 입력하세요</h1>
                     <input
-                        id="tags"
                         type="text"
-                        placeholder="Add a tag and press Enter"
+                        placeholder="제목을 입력하세요"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        className="title-input"
+                    />
+                    <input
+                        type="text"
+                        placeholder="태그를 입력하세요 (Enter로 구분)"
+                        className="tag-input"
                         onKeyDown={(e) => {
-                            if (e.key === 'Enter' && e.target.value) {
-                                handleAddTag(e.target.value);
+                            if (e.key === 'Enter') {
+                                e.preventDefault();
+                                handleAddTag(e.target.value.trim());
                                 e.target.value = '';
                             }
                         }}
                     />
-                </div>
-                <button onClick={handleGetSuggestedTags}>Get Suggested Tags</button>
-                {suggestedTags.length > 0 && (
-                    <div className="suggested-tags">
-                        <p>Suggested Tags:</p>
-                        {suggestedTags.map(tag => (
-                            <span
-                                key={tag}
-                                className="suggested-tag"
-                                onClick={() => handleAddTag(tag)}
-                            >
+                    <div className="tags-display">
+                        {tags.map(tag => (
+                            <span key={tag} className="tag">
                                 {tag}
+                                <button onClick={() => handleRemoveTag(tag)}>x</button>
                             </span>
                         ))}
                     </div>
-                )}
+                </div>
+                <div className="editor-toolbar">
+                    <button onClick={() => handleHeading(1)}>H1</button>
+                    <button onClick={() => handleHeading(2)}>H2</button>
+                    <button onClick={() => handleHeading(3)}>H3</button>
+                    <button onClick={() => handleHeading(4)}>H4</button>
+                    <button onClick={handleBold}>B</button>
+                    <button onClick={handleItalic}>I</button>
+                    <button onClick={handleStrikethrough}>~~</button>
+                    <button onClick={handleLink}>Link</button>
+                    <button onClick={handleCode}>Code Block</button>
+                    <button onClick={handleBlockquote}>Quote</button>
+                    <button onClick={handleImageUpload}>Image</button>
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        style={{display: 'none'}}
+                        onChange={handleFileChange}
+                    />
+                </div>
+                <textarea
+                    className="markdown-editor"
+                    placeholder="당신의 이야기를 적어보세요..."
+                    value={markdown}
+                    onChange={(e) => setMarkdown(e.target.value)}
+                />
             </div>
-            <div className="form-group">
-                <button onClick={handleGetDraft}>Get AI Draft</button>
+            <div className="preview-section">
+                <div className="preview-header">
+                    <h1>{title}</h1>
+                </div>
+                <ReactMarkdown
+                    children={markdown}
+                    remarkPlugins={[remarkGfm, remarkBreaks]}
+                    components={{
+                        blockquote({ children }) {
+                            return <blockquote className="markdown-blockquote">{children}</blockquote>;
+                        },
+                        code({ node, inline, className, children, ...props }) {
+                            const match = /language-(\w+)/.exec(className || '');
+                            return !inline && match ? (
+                                <SyntaxHighlighter
+                                    style={materialLight}
+                                    language={match[1]}
+                                    PreTag="div"
+                                    className="markdown-code"
+                                    {...props}
+                                >
+                                    {String(children).replace(/\n$/, '')}
+                                </SyntaxHighlighter>
+                            ) : (
+                                <code className={`markdown-code ${className}`} {...props}>
+                                    {children}
+                                </code>
+                            );
+                        },
+                        del({ children }) {
+                            return <del>{children}</del>;
+                        },
+                    }}
+                />
             </div>
-            <div className="form-group">
-                <button onClick={handleSubmit}>Create Post</button>
-            </div>
+            <button onClick={handleSubmit} className="submit-button">Submit</button>
+            {error && <p className="error-message">{error}</p>}
         </div>
     );
 };

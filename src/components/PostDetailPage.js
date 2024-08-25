@@ -4,8 +4,11 @@ import { useParams } from 'react-router-dom';
 import { API_BASE_URL } from './apiConfig';
 import Cookies from 'js-cookie';
 import ReactMarkdown from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { solarizedlight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import remarkGfm from 'remark-gfm';
 import './PostDetailPage.css';
+import solarizedDark from "react-syntax-highlighter/dist/cjs/styles/hljs/solarized-dark";
 
 const apiClient = axios.create({
     baseURL: API_BASE_URL
@@ -102,7 +105,28 @@ const PostDetailPage = () => {
             </p>
 
             <div className="post-content">
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    components={{
+                        code({ node, inline, className, children, ...props }) {
+                            const match = /language-(\w+)/.exec(className || '');
+                            return !inline && match ? (
+                                <SyntaxHighlighter
+                                    style={solarizedDark} // 스타일을 여기에 설정합니다.
+                                    language={match[1]}
+                                    PreTag="div"
+                                    {...props}
+                                >
+                                    {String(children).replace(/\n$/, '')}
+                                </SyntaxHighlighter>
+                            ) : (
+                                <code className={className} {...props}>
+                                    {children}
+                                </code>
+                            );
+                        }
+                    }}
+                >
                     {post.content}
                 </ReactMarkdown>
             </div>
