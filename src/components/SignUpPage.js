@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { API_BASE_URL } from './apiConfig';
+import { API_BASE_URL } from '../utils/apiConfig';
 import './SignUpPage.css';
 
 const apiClient = axios.create({

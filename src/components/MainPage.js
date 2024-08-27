@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { API_BASE_URL } from './apiConfig';
+import { API_BASE_URL } from '../utils/apiConfig';
 import './MainPage.css'; // CSS 파일 임포트
 import { Link } from 'react-router-dom';
 import { jwtDecode } from "jwt-decode";

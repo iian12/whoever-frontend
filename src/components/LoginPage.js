@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import './LoginPage.css';
-import { API_BASE_URL } from './apiConfig';
+import { API_BASE_URL } from '../utils/apiConfig';
 
 const apiClient = axios.create({
     baseURL: API_BASE_URL,

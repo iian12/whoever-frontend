@@ -1,7 +1,7 @@
 // apiClient.js
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import {API_BASE_URL} from "../components/apiConfig";
+import {API_BASE_URL} from "./apiConfig";
 
 const apiClient = axios.create({
     baseURL: API_BASE_URL

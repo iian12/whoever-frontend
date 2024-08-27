@@ -4,29 +4,30 @@
     height: 100vh;
     padding: 20px;
     box-sizing: border-box;
-    background-color: #f7f7f7; /* 페이지 배경색 추가 */
+    background-color: #eef2f7; /* 페이지 배경색을 밝고 깔끔하게 */
 }
 
 .editor-section {
     width: 50%;
     display: flex;
     flex-direction: column;
-    padding-right: 15px; /* 패딩을 더 여유롭게 */
-    border-right: 2px solid #ececec; /* 경계선 두께와 색상 변경 */
-    background-color: #ffffff; /* 배경색 추가 */
-    border-radius: 8px; /* 모서리를 둥글게 */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 부드러운 그림자 추가 */
+    padding-right: 20px;
+    border-right: 1px solid #d1d9e0; /* 경계선 두께와 색상 조정 */
+    background-color: #ffffff;
+    border-radius: 12px; /* 모서리를 더 둥글게 */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* 그림자 강조 */
+    overflow: hidden; /* 내용이 넘치지 않도록 처리 */
 }
 
 .preview-section {
     width: 50%;
-    padding-left: 15px;
+    padding-left: 20px;
     overflow-y: auto;
     background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin-left: 10px;
-    color: #333; /* 텍스트 색상 명시 */
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    margin-left: 20px;
+    color: #2c3e50; /* 텍스트 색상 다크 그레이로 */
 }
 
 .editor-header {
@@ -34,150 +35,177 @@
 }
 
 .editor-header h1 {
-    margin: 0 0 10px;
-    font-size: 24px;
-    color: #333;
-    border-bottom: 2px solid #ececec; /* 제목 하단에 경계선 추가 */
-    padding-bottom: 10px; /* 하단 패딩 추가 */
+    margin: 0 0 15px;
+    font-size: 26px; /* 폰트 크기 증가 */
+    color: #34495e;
+    border-bottom: 2px solid #d1d9e0;
+    padding-bottom: 15px;
+    font-weight: 600; /* 폰트 두께 조정 */
 }
 
 .title-input {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     font-size: 18px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    margin-bottom: 10px;
-    background-color: #f9f9f9; /* 입력창 배경색 */
+    border: 1px solid #d1d9e0; /* 테두리 색상 연하게 */
+    border-radius: 8px; /* 모서리 더 둥글게 */
+    margin-bottom: 15px;
+    background-color: #f9f9f9;
+    color: #2c3e50; /* 텍스트 색상 다크 그레이 */
 }
 
 .tag-input {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    border: 1px solid #d1d9e0;
+    border-radius: 8px;
     margin-bottom: 20px;
-    background-color: #f9f9f9; /* 입력창 배경색 */
+    background-color: #f9f9f9;
+    color: #2c3e50;
 }
 
 .tags-display {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 10px;
     margin-bottom: 20px;
 }
 
 .tag {
     display: flex;
     align-items: center;
-    padding: 6px 10px;
+    padding: 8px 12px;
     font-size: 14px;
-    background-color: #e0e0e0;
+    background-color: #ecf0f1;
     border-radius: 12px;
-    color: #333;
+    color: #2c3e50;
 }
 
 .tag button {
     background: none;
     border: none;
-    color: #888;
-    margin-left: 5px;
+    color: #7f8c8d;
+    margin-left: 8px;
     cursor: pointer;
     font-size: 14px;
+    transition: color 0.2s ease-in-out;
 }
 
 .tag button:hover {
-    color: #555;
+    color: #34495e;
 }
 
 .editor-toolbar {
     display: flex;
     gap: 10px;
-    margin-bottom: 10px;
-    flex-wrap: wrap; /* 버튼들이 작은 화면에서 줄바꿈되도록 설정 */
+    margin-bottom: 15px;
+    flex-wrap: wrap;
 }
 
 .editor-toolbar button {
     padding: 10px 15px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    font-size: 14px; /* 버튼 폰트 크기 감소 */
+    border: 1px solid #d1d9e0;
+    border-radius: 8px;
     cursor: pointer;
-    background-color: #f4f4f4;
+    background-color: #ecf0f1;
     transition: background-color 0.3s, transform 0.2s;
 }
 
 .editor-toolbar button:hover {
-    background-color: #ddd;
-    transform: translateY(-2px); /* 호버 시 살짝 올라오는 효과 */
+    background-color: #d5dbdb;
+    transform: translateY(-2px);
 }
 
 .markdown-editor {
     flex-grow: 1;
     width: 100%;
-    padding: 15px; /* 패딩 증가 */
+    padding: 15px;
     font-size: 16px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    border: 1px solid #d1d9e0;
+    border-radius: 8px;
     resize: none;
-    background-color: #f9f9f9; /* 입력창 배경색 */
-    line-height: 1.5; /* 텍스트 라인 간격 증가 */
+    background-color: #f9f9f9;
+    line-height: 1.6;
+    color: #2c3e50;
+    min-height: 300px; /* 최소 높이 설정 */
 }
 
 .submit-button {
     padding: 12px 20px;
     font-size: 18px;
-    background-color: #007bff;
+    background-color: #3498db;
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 8px;
     cursor: pointer;
     transition: background-color 0.3s, box-shadow 0.2s;
-    align-self: flex-end; /* 버튼을 오른쪽 끝으로 정렬 */
+    align-self: flex-end;
     margin-top: 20px;
 }
 
 .submit-button:hover {
-    background-color: #0056b3;
-    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+    background-color: #2980b9;
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
 }
 
 .error-message {
-    color: red;
+    color: #e74c3c;
     margin-top: 10px;
     font-size: 14px;
 }
 
-/* Add this to your CreatePostPage.css file */
-
 .markdown-code {
     display: block;
-    white-space: pre-wrap; /* 공백과 줄바꿈을 유지 */
-    overflow-x: auto; /* 코드가 길어질 경우 가로 스크롤 추가 */
-    padding: 15px; /* 패딩 추가 */
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background-color: #f5f5f5; /* 배경색 추가 */
-    line-height: 1.5; /* 텍스트 라인 간격 증가 */
+    white-space: pre-wrap;
+    overflow-x: auto;
+    padding: 15px;
+    border: 1px solid #d1d9e0;
+    border-radius: 8px;
+    background-color: #f7f9f9;
+    line-height: 1.6;
+    color: #2c3e50;
 }
+
 .markdown-code .token {
     font-size: 14px;
 }
 
 /* 인용문 스타일 */
 .markdown-blockquote {
-    border-left: 4px solid #007bff; /* 왼쪽 경계선 추가 */
-    padding: 10px 15px; /* 패딩 추가 */
-    margin: 10px 0; /* 마진 추가 */
-    background-color: #f0f8ff; /* 배경색 추가 */
-    border-radius: 4px; /* 모서리를 둥글게 */
-    font-style: italic; /* 텍스트를 기울이기 */
-    color: #333; /* 텍스트 색상 명시 */
+    border-left: 4px solid #3498db;
+    padding: 12px 20px;
+    margin: 15px 0;
+    background-color: #eaf2f8;
+    border-radius: 8px;
+    font-style: italic;
+    color: #2c3e50;
 }
 
 .preview-section h1 {
-    font-size: 24px;
-    color: #333;
+    font-size: 32px;
+    color: #34495e;
     margin-bottom: 20px;
+}
+
+.preview-section h2 {
+    font-size: 24px; /* H2의 폰트 크기를 더 작게 설정 */
+    color: #34495e;
+    margin-bottom: 18px;
+    font-weight: 600; /* H2의 폰트 두께 설정 */
+}
+
+.preview-section h3 {
+    font-size: 19px; /* H2의 폰트 크기를 더 작게 설정 */
+    color: #34495e;
+    margin-bottom: 18px;
+    font-weight: 600; /* H2의 폰트 두께 설정 */
+}
+
+.preview-section h4 {
+    font-size: 12px; /* H2의 폰트 크기를 더 작게 설정 */
+    color: #34495e;
+    margin-bottom: 18px;
+    font-weight: 600; /* H2의 폰트 두께 설정 */
 }

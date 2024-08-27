@@ -7,7 +7,7 @@ import remarkBreaks from 'remark-breaks';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import { API_BASE_URL, API_BASE_IMAGE_URL } from './apiConfig';
+import { API_BASE_URL, API_BASE_IMAGE_URL } from '../utils/apiConfig';
 import './CreatePostPage.css';
 
 const CreatePostPage = () => {
