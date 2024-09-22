@@ -10,7 +10,7 @@ const apiClient = axios.create({
 });
 
 const Login = ({ onLogin }) => {
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
 
@@ -18,7 +18,7 @@ const Login = ({ onLogin }) => {
         e.preventDefault();
 
         apiClient
-            .post('/auth/login', { username, password })
+            .post('/auth/login', { email, password })
             .then((response) => {
                 onLogin(); // 로그인 성공 시 호출
             })
@@ -28,19 +28,24 @@ const Login = ({ onLogin }) => {
             });
     };
 
+    const handleGoogleSignIn = () => {
+        // 구글 OAuth2 인증 페이지로 리다이렉트
+        window.location.href = 'http://localhost:8080/oauth2/authorization/google';
+    };
+
     return (
         <div className="login-container">
             <form onSubmit={handleLogin} className="login-form">
                 <h2>Sign In</h2>
-                <p>Enter your username and password to login.</p>
+                <p>Enter your email and password to login.</p>
                 {error && <div className="error-message">{error}</div>} {/* 에러 메시지 표시 */}
                 <label>
                     Username
                     <input
                         type="text"
                         placeholder="Enter your username"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         required
                     />
                 </label>
@@ -55,6 +60,9 @@ const Login = ({ onLogin }) => {
                     />
                 </label>
                 <button type="submit">Sign In</button>
+                <button onClick={handleGoogleSignIn} className="google-signin-button">
+                    Sign In with Google
+                </button>
                 <div className="login-links">
                     <Link to="/reset-password">Forgot your password?</Link>
                     <Link to="/signup">Register</Link>

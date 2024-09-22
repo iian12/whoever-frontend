@@ -72,3 +72,22 @@ body {
     color: #00a8e1;
     text-decoration: none;
 }
+
+.google-signin-button {
+    width: 100%;
+    padding: 0.75rem;
+    margin-top: 1rem;
+    background-color: #4285F4; /* 구글의 대표 색상 */
+    border: none;
+    border-radius: 4px;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.google-signin-button:hover {
+    background-color: #357ae8; /* 호버 시 색상 변경 */
+}

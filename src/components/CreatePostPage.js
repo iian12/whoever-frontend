@@ -73,10 +73,7 @@ const CreatePostPage = () => {
 
             try {
                 const response = await axios.post(`${API_BASE_IMAGE_URL}/images/upload`, formData, {
-                    headers: {
-                        Authorization: `Bearer ${Cookies.get('accessToken')}`,
-                        'Content-Type': 'multipart/form-data'
-                    },
+                    withCredentials: true,
                 });
                 if (response.status === 200 && response.data.url) {
                     insertText(`![이미지 설명](${response.data.url})`);
@@ -90,7 +87,6 @@ const CreatePostPage = () => {
     };
 
     const handleSubmit = async () => {
-        const token = Cookies.get('accessToken');
         if (!title.trim() || !markdown.trim()) {
             setError('Title and content cannot be empty.');
             return;
@@ -102,7 +98,7 @@ const CreatePostPage = () => {
                 content: markdown,
                 hashtagNames: tags
             }, {
-                headers: { Authorization: `Bearer ${token}` },
+                withCredentials: true,
             });
 
             const postId = response.data;

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '../utils/apiConfig';
 import './SignUpPage.css';
 
@@ -10,9 +10,8 @@ const apiClient = axios.create({
 
 const SignUp = () => {
     const [formData, setFormData] = useState({
-        username: '',
-        password: '',
         email: '',
+        password: '',
         nickname: '',
     });
     const [error, setError] = useState('');
@@ -25,6 +24,11 @@ const SignUp = () => {
         });
     };
 
+    const handleGoogleSignIn = () => {
+        // 구글 OAuth2 인증 페이지로 리다이렉트
+        window.location.href = 'http://localhost:8080/oauth2/authorization/google';
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
 
@@ -33,9 +37,8 @@ const SignUp = () => {
             .then(() => {
                 setSuccessMessage('Registration successful! You can now log in.');
                 setFormData({
-                    username: '',
-                    password: '',
                     email: '',
+                    password: '',
                     nickname: '',
                 });
                 setError('');
@@ -55,12 +58,12 @@ const SignUp = () => {
                 {successMessage && <p className="success-message">{successMessage}</p>}
 
                 <label>
-                    Username
+                    Email
                     <input
-                        type="text"
-                        name="username"
-                        placeholder="Enter your username"
-                        value={formData.username}
+                        type="email"
+                        name="email"
+                        placeholder="Enter your email"
+                        value={formData.email}
                         onChange={handleChange}
                         required
                     />
@@ -77,19 +80,6 @@ const SignUp = () => {
                         required
                     />
                 </label>
-
-                <label>
-                    Email
-                    <input
-                        type="email"
-                        name="email"
-                        placeholder="Enter your email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                    />
-                </label>
-
                 <label>
                     Nickname
                     <input
@@ -103,7 +93,9 @@ const SignUp = () => {
                 </label>
 
                 <button type="submit">Sign Up</button>
-
+                <button onClick={handleGoogleSignIn} className="google-signin-button">
+                    Sign In with Google
+                </button>
                 <div className="login-link">
                     Already have an account? <Link to="/login">Log in</Link>
                 </div>
@@ -111,5 +103,4 @@ const SignUp = () => {
         </div>
     );
 };
-
 export default SignUp;

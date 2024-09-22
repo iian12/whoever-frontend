@@ -65,6 +65,15 @@ body {
     background-color: #007bb5;
 }
 
+.google-login-button {
+    background-color: #db4437;
+    margin-top: 10px;
+}
+
+.google-login-button:hover {
+    background-color: #c23321;
+}
+
 .login-link {
     text-align: center;
     margin-top: 15px;

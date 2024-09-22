@@ -38,19 +38,20 @@ const PostDetailPage = () => {
             }
 
             try {
-                const token = Cookies.get('accessToken');
-                const headers = token ? { Authorization: `Bearer ${token}` } : {};
-
-                const response = await apiClient.get(`/posts/${postId}`, { headers });
+                const response = await apiClient.get(`/posts/${postId}`,
+                    {
+                        withCredentials: true
+                    });
                 setPost(response.data);
             } catch (err) {
                 console.error('API Error:', err);
                 setError('Failed to fetch post details');
             }
         };
-
-        fetchPost();
-    }, [postId, isAuthenticated]);
+        if (postId) {
+            fetchPost()
+        }
+        }, [postId]);
 
     const handleCommentChange = (e) => {
         setNewComment(e.target.value);
@@ -62,15 +63,15 @@ const PostDetailPage = () => {
 
     const handleCommentSubmit = async () => {
         try {
-            const token = Cookies.get('accessToken');
-            const headers = token ? { Authorization: `Bearer ${token}` } : {};
             const requestData = {
                 postId: postId,
                 content: newComment,
                 parentCommentId: null // 일반 댓글이므로 부모 댓글 ID는 null
             };
 
-            const response = await apiClient.post(`/comments`, requestData, { headers });
+            const response = await apiClient.post(`/comments`, requestData, {
+                withCredentials: true,
+            });
 
             setPost(prevPost => ({
                 ...prevPost,
@@ -85,15 +86,15 @@ const PostDetailPage = () => {
 
     const handleReplySubmit = async (parentCommentId) => {
         try {
-            const token = Cookies.get('accessToken');
-            const headers = token ? { Authorization: `Bearer ${token}` } : {};
             const requestData = {
                 postId: postId,
                 content: replyComment[parentCommentId],
                 parentCommentId: parentCommentId // 부모 댓글 ID 설정
             };
 
-            const response = await apiClient.post(`/comments`, requestData, { headers });
+            const response = await apiClient.post(`/comments`, requestData, {
+                withCredentials: true,
+            });
 
             setPost(prevPost => ({
                 ...prevPost,
@@ -112,9 +113,9 @@ const PostDetailPage = () => {
 
     const handleLike = async () => {
         try {
-            const token = Cookies.get('accessToken');
-            const headers = token ? { Authorization: `Bearer ${token}` } : {};
-            await apiClient.post(`/posts/${postId}/like`, {}, { headers });
+            await apiClient.post(`/posts/${postId}/like`, {}, {
+                withCredentials: true,
+            });
 
             setPost(prevPost => ({
                 ...prevPost,

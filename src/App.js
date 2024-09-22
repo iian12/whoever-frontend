@@ -1,14 +1,15 @@
-import React, {useEffect, useState} from "react";
-import {BrowserRouter as Router, Navigate, Route, Routes} from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { BrowserRouter as Router, Navigate, Route, Routes } from "react-router-dom";
 import NavBar from './components/NavBar';
 import MainPage from './components/MainPage';
-import LoginPage from './components/LoginPage';
+import Login from './components/LoginPage';
 import ProfilePage from './components/ProfilePage';
 import CreatePostPage from './components/CreatePostPage';
 import SignUpPage from './components/SignUpPage';
+import OAuth2Callback from "./components/OAuth2Callback";
 import PasswordResetPage from './components/PasswordResetPage';
 import Cookies from 'js-cookie';
-import PostDetailPage from "./components/PostDetailPage"; // 쿠키에서 토큰을 가져오기 위한 라이브러리
+import PostDetailPage from "./components/PostDetailPage";
 
 const App = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -23,10 +24,17 @@ const App = () => {
     };
 
     const handleLogout = () => {
+        localStorage.removeItem('accessToken');
         Cookies.remove('accessToken');
-        Cookies.remove('refreshToken');// 쿠키에서 토큰을 제거
+        Cookies.remove('refreshToken'); // 쿠키에서 토큰을 제거
         setIsLoggedIn(false);
         window.location.href = '/';
+    };
+
+    const onLogin = (accessToken) => {
+        // accessToken으로 로그인 상태를 처리
+        localStorage.setItem('accessToken', accessToken);
+        setIsLoggedIn(true);
     };
 
     return (
@@ -36,7 +44,10 @@ const App = () => {
                 <Route path="/" element={<MainPage />} />
                 <Route
                     path="/login"
-                    element={isLoggedIn ? <Navigate to="/" /> : <LoginPage onLogin={handleLogin} />}
+                    element={isLoggedIn ? <Navigate to="/" /> : <Login onLogin={handleLogin} />}
+                />
+                <Route
+                    path="/login/callback" element={<OAuth2Callback onLogin={onLogin}/>}
                 />
                 <Route
                     path="/signup"
