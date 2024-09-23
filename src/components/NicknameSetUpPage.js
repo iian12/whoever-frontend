@@ -25,19 +25,18 @@ const NicknameSetupPage = () => {
     };
 
     return (
-        <div>
-            <h1>Set Your Nickname</h1>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>Nickname</label>
-                    <input
-                        type="text"
-                        value={nickname}
-                        onChange={(e) => setNickname(e.target.value)}
-                        required
-                    />
-                </div>
-                {error && <p style={{color: 'red'}}>{error}</p>}
+        <div className="nickname-setup-container">
+            <form className="nickname-setup-form" onSubmit={handleSubmit}>
+                <h1>Set Your Nickname</h1>
+                <label htmlFor="nickname">Nickname</label>
+                <input
+                    id="nickname"
+                    type="text"
+                    value={nickname}
+                    onChange={(e) => setNickname(e.target.value)}
+                    required
+                />
+                {error && <p>{error}</p>}
                 <button type="submit">Submit</button>
             </form>
         </div>
