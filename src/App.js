@@ -8,6 +8,7 @@ import CreatePostPage from './components/CreatePostPage';
 import SignUpPage from './components/SignUpPage';
 import OAuth2Callback from "./components/OAuth2Callback";
 import PasswordResetPage from './components/PasswordResetPage';
+import NicknameSetUpPage from './components/NicknameSetUpPage';
 import Cookies from 'js-cookie';
 import PostDetailPage from "./components/PostDetailPage";
 
@@ -68,6 +69,10 @@ const App = () => {
                 <Route
                     path="/posts/:postId"
                     element={<PostDetailPage />}
+                />
+                <Route
+                    path="/signup/nickname" // 닉네임 설정 페이지 경로 추가
+                    element={<NicknameSetUpPage />}
                 />
             </Routes>
         </Router>

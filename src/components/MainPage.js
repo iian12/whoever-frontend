@@ -67,7 +67,13 @@ const MainPage = ({handleLogout}) => {
                                 )}
                                 <div className="post-info">
                                     <h2>{post.title}</h2>
-                                    <p className="author">By {post.authorNickname}</p>
+                                    <p className="author">
+                                        By{' '}
+                                        <Link to={`/members/${post.authorIdentifier}/${post.authorNickname}`}
+                                              className="author-link">
+                                            {post.authorNickname}
+                                        </Link>
+                                    </p>
                                     <p className="date">{new Date(post.createdAt).toLocaleString()}</p>
                                 </div>
                             </Link>
