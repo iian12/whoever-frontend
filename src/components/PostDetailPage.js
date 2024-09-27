@@ -14,17 +14,19 @@ const apiClient = axios.create({
 });
 
 const PostDetailPage = () => {
-    const { postId } = useParams(); // URL에서 게시글 ID 가져오기
+    const { postId } = useParams();
     const [post, setPost] = useState(null);
     const [error, setError] = useState(null);
     const [newComment, setNewComment] = useState('');
-    const [replyComment, setReplyComment] = useState({}); // 대댓글 입력 상태
+    const [replyComment, setReplyComment] = useState({});
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [token, setToken] = useState(null);
 
     useEffect(() => {
         const checkAuth = () => {
             const token = Cookies.get('accessToken');
             setIsAuthenticated(!!token);
+            setToken(token);
         };
 
         checkAuth();
@@ -38,20 +40,24 @@ const PostDetailPage = () => {
             }
 
             try {
-                const response = await apiClient.get(`/posts/${postId}`,
-                    {
-                        withCredentials: true
-                    });
+                const response = await apiClient.get(`/posts/${postId}`, {
+                    headers: {
+                        Authorization: token ? `Bearer ${token}` : '',
+                    },
+                    withCredentials: true
+                });
+                console.log("Fetched post data:", response.data);
                 setPost(response.data);
             } catch (err) {
                 console.error('API Error:', err);
                 setError('Failed to fetch post details');
             }
         };
+
         if (postId) {
-            fetchPost()
+            fetchPost();
         }
-        }, [postId]);
+    }, [postId, token]);
 
     const handleCommentChange = (e) => {
         setNewComment(e.target.value);
@@ -66,10 +72,13 @@ const PostDetailPage = () => {
             const requestData = {
                 postId: postId,
                 content: newComment,
-                parentCommentId: null // 일반 댓글이므로 부모 댓글 ID는 null
+                parentCommentId: null
             };
 
             const response = await apiClient.post(`/comments`, requestData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
                 withCredentials: true,
             });
 
@@ -89,10 +98,13 @@ const PostDetailPage = () => {
             const requestData = {
                 postId: postId,
                 content: replyComment[parentCommentId],
-                parentCommentId: parentCommentId // 부모 댓글 ID 설정
+                parentCommentId: parentCommentId
             };
 
             const response = await apiClient.post(`/comments`, requestData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
                 withCredentials: true,
             });
 
@@ -114,12 +126,16 @@ const PostDetailPage = () => {
     const handleLike = async () => {
         try {
             await apiClient.post(`/posts/${postId}/like`, {}, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
                 withCredentials: true,
             });
 
             setPost(prevPost => ({
                 ...prevPost,
-                isLiked: !prevPost.isLiked
+                liked: !prevPost.liked,
+                likeCount: prevPost.liked ? prevPost.likeCount - 1 : prevPost.likeCount + 1
             }));
         } catch (err) {
             console.error('Like Post Error:', err);
@@ -142,7 +158,7 @@ const PostDetailPage = () => {
                 </div>
                 {comment.replies && comment.replies.length > 0 && (
                     <ul className="replies-list">
-                        {renderComments(comment.replies)} {/* 대댓글 렌더링 */}
+                        {renderComments(comment.replies)}
                     </ul>
                 )}
             </li>
@@ -161,7 +177,8 @@ const PostDetailPage = () => {
                 <span className="date">Created At: {new Date(post.createdAt).toLocaleString()}</span> |
                 <span className="date">Updated At: {new Date(post.updatedAt).toLocaleString()}</span> |
                 <span className="view-count">Views: {post.viewCount}</span> |
-                <span className="comment-count">Comments: {post.commentCount}</span>
+                <span className="comment-count">Comments: {post.commentCount}</span> |
+                <span className="like-count">Likes: {post.likeCount}</span>
             </p>
 
             <div className="post-content">
@@ -202,20 +219,24 @@ const PostDetailPage = () => {
                 </div>
             </div>
 
-            <button className="like-button" onClick={handleLike}>
-                {post.isLiked ? 'Unlike' : 'Like'}
-            </button>
+            {post && (
+                <button className="like-button" onClick={handleLike}>
+                    {post.liked ? 'Unlike' : 'Like'}
+                </button>
+            )}
 
             <div className="comments-section">
                 <h2>Comments</h2>
-                <div className="comment-form">
-                    <textarea
-                        value={newComment}
-                        onChange={handleCommentChange}
-                        placeholder="Add a comment..."
-                    />
-                    <button onClick={handleCommentSubmit}>Submit</button>
-                </div>
+                {isAuthenticated && (
+                    <div className="comment-form">
+                        <textarea
+                            value={newComment}
+                            onChange={handleCommentChange}
+                            placeholder="Add a comment..."
+                        />
+                        <button onClick={handleCommentSubmit}>Submit</button>
+                    </div>
+                )}
                 <ul className="comments-list">
                     {renderComments(post.comments)}
                 </ul>
